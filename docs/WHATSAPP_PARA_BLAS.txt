@@ -1,0 +1,20 @@
+Ing. Blas, te voy a compartir el conector VIX que uso con ChatGPT.
+
+Para que sea lo más sencillo posible, dejé temporalmente público este repositorio:
+https://github.com/solucionnova/nova-vix-chatgpt
+
+No necesitas instalar nada manualmente ni saber cómo funciona por dentro.
+
+1. Entra al repositorio y abre el archivo PROMPT_PARA_CODEX.txt.
+2. Copia TODO el contenido de ese archivo y pégalo tal cual en Codex.
+3. A partir de ahí deja que Codex haga todo: preparar Windows/WSL2, descargar el código, instalar VIX, configurar el conector, hacer las pruebas y preparar la conexión con ChatGPT.
+4. Codex sólo deberá detenerse si necesita algo que forzosamente tengas que hacer tú, por ejemplo autorizar Windows, reiniciar, iniciar sesión o, ya casi al final, proporcionar la credencial restringida de OpenAI para el Secure MCP Tunnel. Cuando llegue a esa clave, Codex te explicará exactamente cuál crear y para qué sirve. No es una clave para que VIX consuma modelos por API.
+5. Después de darle esa credencial, deja que Codex continúe hasta que pruebe VIX dentro de tu ChatGPT y confirme que todo quedó funcionando.
+
+Cuando Codex te confirme que VIX quedó instalado y probado, mándame únicamente este mensaje:
+
+VIX LISTO
+
+Con eso sabré que ya descargaste e instalaste todo y podré volver privado o cerrar el repositorio temporal.
+
+Si Codex te muestra decisiones técnicas, no necesitas escoger por tu cuenta: pídele que use la opción segura recomendada y que continúe hasta terminar.

@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+.env
+coverage/
+.tmp/
+.tmp-vix060/
+runtime/
+.vix/

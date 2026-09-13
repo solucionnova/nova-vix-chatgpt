@@ -1,0 +1,19 @@
+{
+  "name": "nova-vix-chatgpt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "install:vix": "bash scripts/install-vix.sh",
+    "test:e2e": "node --test test/runtime-e2e.test.mjs",
+    "test": "node --test test/*.test.mjs",
+    "certify": "node scripts/certify.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "zod": "^4.1.5"
+  }
+}
