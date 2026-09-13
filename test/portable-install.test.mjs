@@ -17,13 +17,16 @@ test('macOS service installer is portable and dry-run is side-effect free', asyn
   assert.match(source, /127\.0\.0\.1/);
 
   const testHome = '/tmp/nova-vix-test-home';
+  const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
   const output = execFileSync('/bin/bash', [serviceInstaller], {
     cwd: root,
-    env: { ...process.env, HOME: testHome, NOVA_VIX_INSTALL_DRY_RUN: '1', NODE_BIN: process.execPath, PORT: '18816' },
+    env: { ...process.env, HOME: testHome, NOVA_VIX_INSTALL_DRY_RUN: '1', NODE_BIN: process.execPath, PORT: '18814' },
     encoding: 'utf8'
   });
-  assert.match(output, /label=com\.nova\.vix-chatgpt/);
+  assert.match(output, /label=com\.ramon\.nova-vix-chatgpt/);
   assert.match(output, /port=18816/);
+  assert.match(output, new RegExp(`root=${testHome}/\\.nova/vix-chatgpt/releases/${sourceSha}`));
+  assert.match(output, new RegExp(`source_sha=${sourceSha}`));
   assert.match(output, /plist_valid=true/);
   const pathLine = output.split('\n').find(line => line.startsWith('path='));
   assert.ok(pathLine, 'dry-run must expose the launchd PATH');
