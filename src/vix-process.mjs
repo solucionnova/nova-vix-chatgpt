@@ -1,6 +1,6 @@
 import { spawn, execFile } from 'node:child_process';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { mkdir, mkdtemp, realpath, rm, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, realpath, rm, stat, writeFile } from 'node:fs/promises';
 import { platform, tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
@@ -83,6 +83,18 @@ function spawnIsolated(executable, args, options, platformName) {
   return { child: spawn(spec.command, spec.args, options), spec };
 }
 
+async function seedUserGlobalSkills(configDir, baseEnv) {
+  const home = baseEnv?.HOME;
+  if (!home) return;
+  const source = join(home, '.vix', 'skills');
+  try {
+    const sourceStat = await stat(source);
+    if (sourceStat.isDirectory()) await cp(source, join(configDir, 'skills'), { recursive: true });
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+  }
+}
+
 async function waitForSocket(socketPath, daemon, timeoutMs = 10000) {
   const { createConnection } = await import('node:net');
   const deadline = Date.now() + timeoutMs;
@@ -139,6 +151,7 @@ export class VixProcessManager {
     const bridge = new GatewayBridge();
     await bridge.start();
     await mkdir(configDir, { recursive: true });
+    await seedUserGlobalSkills(configDir, this.baseEnv);
     await mkdir(join(runtimeDir, 'logs'), { recursive: true });
     await writeFile(join(configDir, 'providers.json'), JSON.stringify(buildProviderOverlay(bridge.baseUrl), null, 2) + '\n', { mode: 0o600 });
     const tokenPath = join(runtimeDir, 'socket-token');
