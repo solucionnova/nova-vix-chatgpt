@@ -6,7 +6,7 @@ import { DEFAULT_VIX_BIN } from '../src/runtime.mjs';
 import { STOCK_PROVIDER_IDS, STRIPPED_PROVIDER_ENV, buildLaunchSpec, buildProviderOverlay, inspectVixBinary, isolatedEnv } from '../src/vix-process.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-for (const file of ['src/gateway-bridge.mjs','src/vix-process.mjs','src/runtime.mjs','src/server.mjs','src/tools.mjs','test/runtime-e2e.test.mjs','test/portable-install.test.mjs','scripts/certify.mjs']) {
+for (const file of ['src/gateway-bridge.mjs','src/github-authority.mjs','src/vix-process.mjs','src/runtime.mjs','src/server.mjs','src/tools.mjs','test/runtime-e2e.test.mjs','test/goal-recovery.test.mjs','test/github-authority.test.mjs','test/incremental-exchange.test.mjs','test/portable-install.test.mjs','scripts/certify.mjs']) {
   execFileSync(process.execPath, ['--check', resolve(root, file)], { stdio: 'pipe' });
 }
 

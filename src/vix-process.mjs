@@ -1,6 +1,6 @@
 import { spawn, execFile } from 'node:child_process';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { cp, mkdir, mkdtemp, realpath, rm, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, realpath, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { platform, tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
@@ -135,22 +135,34 @@ export class VixProcessManager {
     this.connections = new Map();
     this.modelCalls = 0;
     this.lastLaunchAudit = null;
+    this.sessionRoot = resolve(baseEnv.NOVA_VIX_STATE_DIR || join(baseEnv.HOME || tmpdir(), '.nova/vix-chatgpt/sessions'));
   }
 
   get activeCount() { return this.connections.size; }
 
-  async open({ cwd, prompt, workflow } = {}) {
+  async open({ cwd, prompt, workflow, resume_id: resumeId } = {}) {
+    if (resumeId) {
+      const existing = this.connections.get(resumeId);
+      if (existing) return this.#openResult(existing);
+      let manifest;
+      try { manifest = JSON.parse(await readFile(join(this.sessionRoot, resumeId, 'manifest.json'), 'utf8')); }
+      catch { throw new Error(`Unknown Vix Goal resume_id ${resumeId}`); }
+      throw new Error(`Vix Goal ${manifest.goal_id} is durable, but stock headless Vix cannot attach it after connector restart; reconnect to the existing connector process using resume_id`);
+    }
     if (!cwd || typeof cwd !== 'string') throw new Error('cwd is required');
     if (!prompt || typeof prompt !== 'string') throw new Error('prompt is required');
     const inspected = await inspectVixBinary(this.vixBin);
     const vixdBin = await validateVixExecutable(join(dirname(inspected.vixBin), 'vixd'));
     if (this.platformName === 'darwin') await validateVixExecutable(SANDBOX_EXEC);
     else if (this.platformName !== 'linux') throw new Error(`Unsupported Vix runtime platform: ${this.platformName}`);
+    const id = randomUUID();
+    const sessionDir = join(this.sessionRoot, id);
     const runtimeDir = await mkdtemp(join(tmpdir(), 'nova-vix-chatgpt-'));
-    const configDir = join(runtimeDir, '.vix');
+    const configDir = join(sessionDir, '.vix');
     const bridge = new GatewayBridge();
     await bridge.start();
-    await mkdir(configDir, { recursive: true });
+    await mkdir(configDir, { recursive: true, mode: 0o700 });
+    await mkdir(sessionDir, { recursive: true, mode: 0o700 });
     await seedUserGlobalSkills(configDir, this.baseEnv);
     await mkdir(join(runtimeDir, 'logs'), { recursive: true });
     await writeFile(join(configDir, 'providers.json'), JSON.stringify(buildProviderOverlay(bridge.baseUrl), null, 2) + '\n', { mode: 0o600 });
@@ -171,8 +183,7 @@ export class VixProcessManager {
 
       const args = ['-config-dir', configDir, '-p', prompt, '-output-format', 'stream-json', '-workdir', resolve(cwd), '-socket-path', socketPath, '-auth-token-path', tokenPath];
       if (workflow) args.push('-w', workflow);
-      const id = randomUUID();
-      const conn = { id, bridge, child: null, daemon, runtimeDir, events: [], stdoutBuffer: '', closed: false, exitCode: null, error: daemonError || null, webPort };
+      const conn = { id, bridge, child: null, daemon, runtimeDir, configDir, cwd: resolve(cwd), workflow, vixVersion: inspected.vixVersion, events: [], stdoutBuffer: '', closed: false, exitCode: null, error: daemonError || null, webPort, nativeThreadId: null };
       const clientLaunch = spawnIsolated(inspected.vixBin, args, { cwd: runtimeDir, env, stdio: ['ignore', 'pipe', 'pipe'] }, this.platformName);
       child = clientLaunch.child;
       conn.child = child;
@@ -202,7 +213,8 @@ export class VixProcessManager {
         syntheticPreflightCredential: true,
         homePreserved: env.HOME === this.baseEnv.HOME || env.HOME === undefined
       };
-      return { connection_id: id, vix_version: inspected.vixVersion, modelCalls: 0 };
+      await this.#persist(conn, { cwd: resolve(cwd), configDir, vixVersion: inspected.vixVersion, workflow });
+      return this.#openResult(conn, inspected.vixVersion);
     } catch (error) {
       await terminateChild(child);
       await terminateChild(daemon);
@@ -220,7 +232,12 @@ export class VixProcessManager {
       const line = conn.stdoutBuffer.slice(0, index).trim();
       conn.stdoutBuffer = conn.stdoutBuffer.slice(index + 1);
       if (!line) continue;
-      try { conn.events.push(JSON.parse(line)); } catch { conn.events.push({ type: 'stdout', text: line.slice(0, 12000) }); }
+      try {
+        const event = JSON.parse(line);
+        conn.events.push({ ...event, _sequence: (conn.nextSequence = (conn.nextSequence || 0) + 1) });
+        const nativeThreadId = event.thread_id || event.data?.thread_id || event.thread?.id;
+        if (nativeThreadId && !conn.nativeThreadId) { conn.nativeThreadId = nativeThreadId; void this.#persist(conn); }
+      } catch { conn.events.push({ type: 'stdout', text: line.slice(0, 12000), _sequence: (conn.nextSequence = (conn.nextSequence || 0) + 1) }); }
     }
   }
 
@@ -234,7 +251,19 @@ export class VixProcessManager {
     }
     const deadline = Date.now() + Math.max(0, Math.min(Number(waitMs) || 0, 30000));
     while (!connection.closed && connection.events.length === 0 && connection.bridge.queue.length === 0 && Date.now() < deadline) await new Promise(resolveWait => setTimeout(resolveWait, 10));
-    return { connection_id: id, events: connection.events.splice(0), inference_requests: connection.bridge.drainRequests(), closed: connection.closed, exit_code: connection.exitCode, mission_control_url: `http://127.0.0.1:${connection.webPort}/`, modelCalls: 0, error: connection.error };
+    const fresh = connection.bridge.drainRequests();
+    const pending = connection.bridge.pendingRequests().filter(item => !fresh.some(next => next.request_id === item.request_id));
+    const result = { connection_id: id, resume_id: id, events: connection.events.splice(0), inference_requests: [...fresh, ...pending], closed: connection.closed, exit_code: connection.exitCode, mission_control_url: `http://127.0.0.1:${connection.webPort}/`, modelCalls: 0, error: connection.error };
+    await this.#persist(connection, { status: connection.closed ? 'closed' : 'active', exitCode: connection.exitCode, lastExchange: { closed: result.closed, pending: result.inference_requests.map(item => item.request_id) } });
+    return result;
+  }
+
+  #openResult(conn, vixVersion = conn.vixVersion) { return { connection_id: conn.id, resume_id: conn.id, native_thread_id: conn.nativeThreadId || null, vix_version: vixVersion || conn.vixVersion, modelCalls: 0 }; }
+
+  async #persist(conn, extra = {}) {
+    const dir = join(this.sessionRoot, conn.id);
+    await mkdir(dir, { recursive: true, mode: 0o700 });
+    await writeFile(join(dir, 'manifest.json'), JSON.stringify({ goal_id: conn.id, connection_id: conn.id, native_thread_id: conn.nativeThreadId || null, cwd: conn.cwd, configDir: conn.configDir, workflow: conn.workflow || null, vix_version: conn.vixVersion, status: conn.closed ? 'closed' : 'active', modelCalls: 0, ...extra }, null, 2) + '\n', { mode: 0o600 });
   }
 
   inferenceContext({ connection_id: id, request_id: requestId, pointer = '/' } = {}) {
@@ -250,6 +279,7 @@ export class VixProcessManager {
     await terminateChild(connection.daemon);
     await connection.bridge.close();
     await rm(connection.runtimeDir, { recursive: true, force: true });
+    await this.#persist(connection, { status: 'closed', closedAt: new Date().toISOString() });
     return { status: 'closed', connection_id: id };
   }
 
