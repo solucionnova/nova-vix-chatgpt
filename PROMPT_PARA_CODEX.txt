@@ -1,49 +1,98 @@
-INSTALA NOVA VIX ↔ CHATGPT COMPLETO EN ESTA COMPUTADORA
+INSTALA Y PRUEBA NOVA VIX ↔ CHATGPT COMPLETO EN ESTA COMPUTADORA
 
-Soy el Ing. Blas Rendón Century 21. No quiero tomar decisiones técnicas ni ejecutar pasos manuales salvo que una acción humana sea realmente inevitable. Tú, Codex, eres responsable de completar toda la instalación, configuración, diagnóstico, corrección y prueba hasta dejar VIX utilizable desde mi ChatGPT.
+CONTEXTO DEL USUARIO
+Soy el Ing. Blas Rendón Century 21. Tengo poca experiencia técnica y quiero que tú, Codex, hagas todo el trabajo técnico de principio a fin. No me pidas que investigue, ejecute comandos manualmente, elija arquitecturas, compare alternativas ni diagnostique errores.
 
-REPOSITORIO FUENTE PÚBLICO TEMPORAL:
+REPOSITORIO FUENTE PÚBLICO TEMPORAL
 https://github.com/solucionnova/nova-vix-chatgpt
 
 RESULTADO OBLIGATORIO
-Debes dejar instalado y probado el conector Nova VIX ↔ ChatGPT en esta computadora Windows. Vix debe ejecutarse como stock Vix 0.6.0 dentro de WSL2/Linux, no como una adaptación nativa de Windows inventada. ChatGPT debe seguir siendo la única autoridad de inferencia. La prueba final debe demostrar, como mínimo, que desde ChatGPT funcionan `vix_open` y `vix_exchange`, que se usa stock Vix 0.6.0 y que el conector reporta `modelCalls: 0`.
+Deja instalado, persistente, conectado y probado el conector Nova VIX ↔ ChatGPT en esta computadora Windows. Vix debe ejecutarse como stock Vix 0.6.0 dentro de WSL2/Linux. ChatGPT debe ser la única autoridad de inferencia. No declares terminado hasta que una prueba real desde ChatGPT demuestre `vix_open`, `vix_exchange`, stock Vix 0.6.0 y `modelCalls: 0`.
 
-FORMA DE TRABAJO
-1. Si el repositorio todavía no está clonado, clónalo tú desde la URL anterior en una ubicación apropiada. Si ya existe, úsalo.
-2. Lee primero `README.md` y `docs/MANUAL_INSTALACION.md` completos y utiliza el propio repositorio como contrato de instalación.
-3. Antes de crear credenciales o configurar el túnel, verifica en la documentación OFICIAL vigente de OpenAI la disponibilidad actual de Full MCP/acciones y Secure MCP Tunnel para mi plan/workspace. La información documentada en este repo es una referencia fechada y puede cambiar. Si mi plan no permite este conector completo, detente únicamente para explicarme ese bloqueo real y qué cambio de plan/workspace es necesario.
-4. Verifica también la documentación oficial vigente de Vix. No sustituyas stock Vix por un fork ni inventes soporte nativo Windows si no existe.
-5. Inspecciona Windows y configura tú mismo WSL2 y una distribución Linux adecuada si todavía no existen. Instala dentro del entorno correcto las dependencias necesarias, Node compatible, Git y las utilidades requeridas. Elige opciones seguras y convencionales sin preguntarme preferencias técnicas.
-6. Si Windows necesita elevación UAC, reinicio o inicio de sesión que sólo yo pueda realizar, pídeme únicamente esa acción concreta. Después del reinicio o autorización, recupera el trabajo y continúa automáticamente desde donde quedaste.
-7. Instala las dependencias del repo y stock Vix 0.6.0 usando los mecanismos incluidos. Verifica checksum/versión. Ejecuta las pruebas y certificación del proyecto. Corrige por tu cuenta cualquier fallo reversible y vuelve a validar.
-8. Configura el conector para ejecutarse de forma persistente en WSL2/Linux y permanecer accesible sólo por loopback en `127.0.0.1:18816`. Usa systemd de usuario si está disponible y es apropiado; si el entorno real exige otro mecanismo soportado, elígelo tú y deja recuperación automática tras reinicio. No abras el MCP directamente a Internet.
-9. Conserva las barreras de inferencia del repositorio: elimina credenciales reales de proveedores del entorno de Vix, usa el provider overlay/loopback local, mantén telemetría de Vix desactivada y no permitas fallback a OpenAI API, Anthropic, OpenRouter, MiniMax, DeepSeek, Bedrock u otro proveedor. No me pidas claves de modelos para Vix.
-10. Configura el Secure MCP Tunnel siguiendo el contrato OFICIAL VIGENTE de OpenAI. Decide tú si el cliente del túnel debe ejecutarse en Windows o WSL2 según la implementación oficial actual y resuelve la conectividad hacia `http://127.0.0.1:18816/mcp` sin pedirme decisiones de red.
+REGLA DE AUTONOMÍA
+Tú decides y ejecutas todo lo técnico. Elige la opción segura, simple y soportada cuando existan varias alternativas. Corrige errores reversibles por tu cuenta y vuelve a probar. No me preguntes preferencias técnicas.
 
-ÚNICO MOMENTO PARA PEDIRME LA CREDENCIAL DEL TÚNEL
-No me pidas ninguna clave hasta que el conector local esté instalado, probado y el túnel esté listo para autenticarse.
+Sólo puedes pedirme intervención cuando físicamente o por permisos de cuenta sea imposible continuar sin mí. Cuando eso ocurra, haz UNA sola petición concreta y usa exactamente esta estructura:
 
-En ese momento explícame en lenguaje simple que necesito proporcionar una credencial dedicada para Secure MCP Tunnel. Según el contrato documentado actualmente debe ser una Runtime API key restringida a `Tunnels Read` + `Tunnels Use`, o los permisos equivalentes que indique la documentación oficial vigente. Esa credencial es para autenticar el túnel/control plane, NO para inferencia de Vix.
+ACCIÓN HUMANA NECESARIA
+QUÉ HACER: explica una sola acción en lenguaje no técnico.
+DÓNDE HACERLO: indica la ventana, página o pantalla exacta.
+QUÉ DEBO VER: describe brevemente qué texto/botón/pantalla confirma que estoy en el lugar correcto.
+QUÉ TE RESPONDO DESPUÉS: dime la frase exacta que debo escribirte para que continúes.
 
-No uses por comodidad una clave general con permisos amplios. No la guardes en el repositorio, archivos de texto, logs ni argumentos visibles. Usa almacenamiento seguro/persistencia recomendada oficialmente. Si para crear la credencial necesito entrar a una página de OpenAI, guíame sólo por esa acción humana y, en cuanto la proporcione/autorizo, continúa por tu cuenta.
+Después de mi respuesta, retoma automáticamente desde el estado existente. No reinicies el proceso desde cero salvo que hayas demostrado que es imprescindible.
 
-CIERRE OBLIGATORIO
-Después de recibir la credencial:
-- termina el Secure MCP Tunnel;
-- verifica health/readiness local y del túnel;
-- guía sólo las acciones humanas inevitables para activar/seleccionar el MCP en ChatGPT;
-- comprueba que ChatGPT descubre `vix_open` y `vix_exchange`;
-- ejecuta desde ChatGPT una prueba real read-only que abra una sesión Vix, produzca al menos un checkpoint de inferencia y lo devuelva a ChatGPT;
-- demuestra stock Vix 0.6.0;
-- demuestra `modelCalls: 0`;
-- demuestra que no se entregaron claves reales de proveedores a Vix;
-- no declares terminado únicamente porque un proceso esté corriendo.
+ORDEN DE TRABAJO
+1. Si el repo no existe localmente, clónalo tú desde la URL anterior. Si ya existe, inspecciona su estado y reutilízalo.
+2. Lee completos `README.md` y `docs/MANUAL_INSTALACION.md` antes de cambiar el sistema.
+3. Comprueba primero el plan/rol real de mi ChatGPT y la documentación OFICIAL vigente de OpenAI sobre Developer Mode, Full MCP y Secure MCP Tunnel. No crees claves ni túneles antes de esta comprobación.
+4. Referencia vigente verificada el 12-09-2026: Full MCP está disponible en ChatGPT Business y Enterprise/Edu en web; Pro sólo read/fetch y no sirve para este VIX completo; Plus tampoco debe tratarse como suficiente. En Business necesito ser Admin/Owner; en Enterprise/Edu necesito el acceso correspondiente a Developer Mode. Si la documentación vigente cambió, aplica la vigente.
+5. Si mi plan, rol o permiso no es suficiente, no compres ni cambies ninguna suscripción. Detente únicamente para mostrarme el bloqueo exacto y la acción mínima necesaria. Pídeme que envíe ese texto a Ramón y espera.
+6. Verifica la documentación oficial vigente de Vix. No sustituyas stock Vix por un fork y no inventes soporte nativo Windows.
+7. Inspecciona Windows. Configura tú WSL2 y una distribución Linux apropiada si hacen falta. Instala dentro del entorno correcto las dependencias requeridas, incluyendo Node compatible, Git y utilidades necesarias.
+8. Si Windows exige UAC, reinicio o inicio de sesión, usa el formato ACCIÓN HUMANA NECESARIA. Tras un reinicio, recupera el estado real del repo y los servicios y continúa desde el punto pendiente.
+9. Instala dependencias del repo y stock Vix 0.6.0 mediante los mecanismos incluidos. Verifica asset, checksum y versión. Ejecuta las pruebas y `npm run certify`. Corrige por tu cuenta cualquier fallo reversible.
+10. Configura persistencia adecuada dentro de WSL2/Linux. Mantén el MCP únicamente en loopback, por defecto `127.0.0.1:18816`. No publiques directamente ese puerto en Internet.
+11. Conserva las barreras de inferencia del repositorio: elimina credenciales reales de proveedores del entorno de Vix, usa el provider overlay/loopback local, desactiva telemetría y no permitas fallback a OpenAI API, Anthropic, OpenRouter, MiniMax, DeepSeek, Bedrock u otro proveedor.
+12. No me pidas `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` ni ninguna clave de modelos para que Vix haga inferencia.
+13. Configura Secure MCP Tunnel siguiendo exclusivamente la documentación oficial vigente de OpenAI. El cliente debe ejecutarse en el lugar que pueda alcanzar de forma fiable el MCP local. Resuelve tú si corresponde Windows o WSL2 y verifica conectividad real hacia `http://127.0.0.1:18816/mcp`.
 
-AUTONOMÍA
-No me presentes alternativas técnicas, arquitecturas, comandos para copiar o decisiones internas. Inspecciona, decide, instala, corrige y verifica tú. Sólo puedes detenerte por una acción humana inevitable: UAC/reinicio/login, incompatibilidad real del plan ChatGPT o la credencial restringida del túnel cuando llegue el momento.
+PLAN, ROL Y PERMISOS DE OPENAI
+Developer Mode de ChatGPT y los permisos de túneles de OpenAI Platform son controles distintos. Comprueba ambos.
 
-Cuando la prueba completa haya pasado, dime claramente:
+Referencia vigente al 12-09-2026:
+- crear/editar un túnel: Tunnels Read + Manage;
+- ejecutar `tunnel-client` o seleccionar el túnel en la app: Tunnels Read + Use;
+- Secure MCP Tunnel requiere `tunnel_id` y una runtime API key para `tunnel-client`.
 
-"VIX quedó instalado y probado. Ahora envía a Ramón exactamente este mensaje: VIX LISTO"
+Si no tengo permiso para crear el túnel o asociarlo al workspace correcto, no improvises. Usa ACCIÓN HUMANA NECESARIA para guiar el login o permiso que corresponda. Si requiere que un administrador/owner externo cambie permisos, muestra el bloqueo exacto para que yo se lo envíe a Ramón.
+
+MOMENTO EXACTO PARA PEDIRME LA CLAVE DEL TÚNEL
+No me pidas ninguna clave hasta que:
+- el MCP local esté instalado y probado;
+- las pruebas/certificación pasen;
+- el plan/rol de ChatGPT sea compatible;
+- exista o esté listo el `tunnel_id` correcto;
+- `tunnel-client` esté instalado/configurado hasta el punto en que sólo falte autenticarse.
+
+En ese momento escribe exactamente el encabezado:
+
+ACCIÓN HUMANA NECESARIA - CLAVE DEL TÚNEL
+
+Después explícame que debo crear/proporcionar una runtime API key DEDICADA y de mínimo privilegio para el túnel, con `Tunnels Read + Use` o los permisos equivalentes que indique la documentación oficial vigente. Si para crear/editar el túnel previamente hace falta `Tunnels Read + Manage`, guíame por separado y no confundas esa autorización administrativa con la clave de ejecución.
+
+La clave del túnel autentica `tunnel-client` contra el control plane de OpenAI. NO es una clave para inferencia de Vix. No la guardes en Git, archivos de texto, logs ni argumentos visibles. Usa almacenamiento seguro. Nunca me pidas que la envíe por WhatsApp, GitHub o a Ramón.
+
+SI TE DETIENES ANTES DE TERMINAR
+Si una respuesta tuya termina pero la instalación completa aún no ha pasado la prueba final, considera mi siguiente mensaje `CONTINÚA` como autorización para retomar el estado real, resolver lo pendiente y seguir hasta el resultado obligatorio. No conviertas el final de un turno en final del trabajo.
+
+SI PIERDES CONTEXTO O SE ABRE UN CHAT NUEVO
+Lee otra vez este archivo, inspecciona el estado actual de Windows/WSL2/repo/servicios y continúa desde lo que realmente ya esté hecho. No repitas efectos ni reinstales componentes sin comprobar antes su estado.
+
+SI APARECE UN ERROR
+Diagnostica la causa, corrige lo reversible y reintenta sólo la operación afectada. Pídeme intervención únicamente si el error requiere una acción humana real.
+
+SI NECESITAS UNA DECISIÓN TÉCNICA
+Tómala tú usando la opción segura, simple y soportada. No me hagas escoger.
+
+SI CHATGPT CAMBIÓ DE INTERFAZ
+Usa documentación oficial vigente de OpenAI. Para Full MCP usa la superficie web compatible. Guíame sólo por los clics que inevitablemente deba realizar yo.
+
+PRUEBA FINAL OBLIGATORIA
+Con MCP y túnel sanos, deja la app/MCP configurada en el ChatGPT web compatible y ejecuta una prueba real desde ChatGPT que demuestre:
+- `vix_open` visible y ejecutable;
+- al menos un checkpoint recibido mediante `vix_exchange`;
+- ese checkpoint respondido por el propio ChatGPT;
+- stock Vix 0.6.0;
+- `modelCalls: 0`;
+- ausencia de claves reales de proveedores dentro del proceso Vix;
+- cierre exitoso del turno.
+
+Un proceso corriendo, un puerto abierto o `/healthz` no bastan.
+
+CIERRE
+Cuando TODO lo anterior haya pasado, dime exactamente:
+
+VIX quedó instalado y probado. Ahora envía a Ramón exactamente este mensaje: VIX LISTO
 
 No termines antes de esa prueba final.

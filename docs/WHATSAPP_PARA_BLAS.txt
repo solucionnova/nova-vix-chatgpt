@@ -1,20 +1,110 @@
-Ing. Blas, te voy a compartir el conector VIX que uso con ChatGPT.
+Ing. Blas, soy ChatGPT y te escribo de parte de Ramón Sandoval.
 
-Para que sea lo más sencillo posible, dejé temporalmente público este repositorio:
+Ramón quiere compartirte el conector VIX que usa con ChatGPT. Preparé el proceso para que no tengas que instalar ni diagnosticar cosas por tu cuenta: Codex debe encargarse de prácticamente todo.
+
+Repositorio público temporal:
 https://github.com/solucionnova/nova-vix-chatgpt
 
-No necesitas instalar nada manualmente ni saber cómo funciona por dentro.
+Te envío DOS ANEXOS:
 
-1. Entra al repositorio y abre el archivo PROMPT_PARA_CODEX.txt.
-2. Copia TODO el contenido de ese archivo y pégalo tal cual en Codex.
-3. A partir de ahí deja que Codex haga todo: preparar Windows/WSL2, descargar el código, instalar VIX, configurar el conector, hacer las pruebas y preparar la conexión con ChatGPT.
-4. Codex sólo deberá detenerse si necesita algo que forzosamente tengas que hacer tú, por ejemplo autorizar Windows, reiniciar, iniciar sesión o, ya casi al final, proporcionar la credencial restringida de OpenAI para el Secure MCP Tunnel. Cuando llegue a esa clave, Codex te explicará exactamente cuál crear y para qué sirve. No es una clave para que VIX consuma modelos por API.
-5. Después de darle esa credencial, deja que Codex continúe hasta que pruebe VIX dentro de tu ChatGPT y confirme que todo quedó funcionando.
+1) PROMPT_PARA_CODEX.txt
+Este es el archivo importante. Ábrelo, copia TODO su contenido y pégalo como un solo mensaje en Codex desde tu computadora Windows.
 
-Cuando Codex te confirme que VIX quedó instalado y probado, mándame únicamente este mensaje:
+2) Manual_Instalacion_Nova_VIX_ChatGPT_Blas_Rendon.pdf
+Es tu guía de referencia. Explica qué va a hacer Codex, cuándo sí necesitas intervenir y qué responder si Codex se detiene o aparece algún problema.
+
+QUÉ TIENES QUE HACER
+
+1. Abre Codex en tu computadora Windows.
+2. Si Codex te pide iniciar sesión, inicia sesión con tu propia cuenta.
+3. Abre el anexo PROMPT_PARA_CODEX.txt.
+4. Copia el archivo COMPLETO y pégalo en Codex como un solo mensaje.
+5. Envíalo y deja que Codex continúe trabajando.
+
+A partir de ahí NO necesitas ejecutar comandos manualmente, escoger opciones técnicas ni diagnosticar errores. Codex debe preparar Windows/WSL2, descargar el repo, instalar VIX, configurar el conector, hacer las pruebas y preparar la conexión con ChatGPT.
+
+CUÁNDO PUEDE PEDIRTE ALGO CODEX
+
+Sólo cuando la acción realmente requiera a una persona, por ejemplo:
+- aceptar un permiso/UAC de Windows;
+- reiniciar Windows;
+- iniciar sesión en una cuenta;
+- habilitar un permiso de ChatGPT/OpenAI;
+- introducir de forma segura la credencial restringida del Secure MCP Tunnel;
+- hacer un clic o confirmación dentro de ChatGPT web.
+
+Cuando necesite algo así, Codex debe decirte claramente QUÉ HACER, DÓNDE HACERLO, QUÉ DEBES VER EN PANTALLA y QUÉ RESPONDERLE DESPUÉS.
+
+SI CODEX SE DETIENE ANTES DE TERMINAR
+
+Escríbele exactamente:
+
+CONTINÚA HASTA TERMINAR TODO EL PROCESO. RESUELVE POR TU CUENTA CUALQUIER PROBLEMA TÉCNICO REVERSIBLE Y DETENTE ÚNICAMENTE SI NECESITAS UNA ACCIÓN HUMANA INEVITABLE.
+
+SI REINICIASTE WINDOWS
+
+Abre de nuevo Codex, preferentemente la misma conversación, y escribe:
+
+RETOMA LA INSTALACIÓN DE VIX DESDE EL ESTADO ACTUAL. COMPRUEBA QUÉ YA QUEDÓ HECHO DESPUÉS DEL REINICIO Y CONTINÚA SIN REPETIR EFECTOS.
+
+SI CODEX PERDIÓ EL CONTEXTO O ABRISTE UN CHAT NUEVO
+
+Vuelve a pegar completo PROMPT_PARA_CODEX.txt y agrega al final:
+
+ESTO ES UNA REANUDACIÓN. INSPECCIONA EL ESTADO ACTUAL ANTES DE REPETIR CUALQUIER INSTALACIÓN Y CONTINÚA DESDE LO QUE YA ESTÉ HECHO.
+
+SI CODEX TE PREGUNTA QUÉ OPCIÓN TÉCNICA PREFIERES
+
+Respóndele:
+
+ELIGE TÚ LA OPCIÓN SEGURA, SIMPLE Y SOPORTADA QUE CUMPLA EL OBJETIVO Y CONTINÚA.
+
+SI APARECE UN ERROR
+
+Respóndele:
+
+DIAGNOSTICA LA CAUSA, CORRIGE LO REVERSIBLE Y CONTINÚA. PÍDEME SÓLO UNA ACCIÓN QUE YO DEBA HACER PERSONALMENTE.
+
+SOBRE TU PLAN DE CHATGPT
+
+Antes de crear claves, Codex debe comprobar tu plan y permisos actuales. Hoy Full MCP para este tipo de conector está disponible en ChatGPT Business y Enterprise/Edu en la web. Pro sólo admite MCP read/fetch y Plus no debe considerarse suficiente para este VIX completo. Además, en Business necesitas ser Admin/Owner para Developer Mode.
+
+Si tu plan, rol o permisos no permiten continuar, NO compres ni cambies nada por tu cuenta. Mándale a Ramón:
+
+VIX BLOQUEADO - PLAN/ROL: [pega aquí exactamente lo que Codex te explique]
+
+o, si el problema es de permisos del túnel/OpenAI Platform:
+
+VIX BLOQUEADO - PERMISOS OPENAI: [pega aquí exactamente lo que Codex te explique]
+
+SOBRE LA CLAVE DE OPENAI
+
+Codex NO debe pedirte una clave al principio. Primero debe dejar instalado y probado el MCP local, verificar tu plan, preparar el túnel y llegar al punto donde sólo falte autenticarse.
+
+Entonces te mostrará algo equivalente a:
+
+ACCIÓN HUMANA NECESARIA - CLAVE DEL TÚNEL
+
+La clave correcta es una runtime API key DEDICADA y restringida para Secure MCP Tunnel, con Tunnels Read + Use (o el equivalente oficial vigente). Sirve para autenticar el túnel. NO es una clave para que VIX consuma modelos de OpenAI por API.
+
+No envíes esa clave por WhatsApp, GitHub, correo, capturas ni a Ramón. Introdúcela únicamente en el flujo seguro/local que Codex te indique.
+
+Si Codex te pide una clave de modelo para VIX, NO se la des. Respóndele:
+
+NO TE DARÉ UNA CLAVE DE MODELO PARA VIX. REVISA EL REPO Y CONSERVA CHATGPT COMO ÚNICA AUTORIDAD DE INFERENCIA. CONTINÚA.
+
+CUÁNDO TERMINA
+
+No basta con que Codex diga que un programa está encendido. Debe probar VIX desde tu ChatGPT y confirmar, entre otras cosas, stock Vix 0.6.0, vix_open, vix_exchange y modelCalls: 0.
+
+Cuando Codex te muestre claramente:
+
+VIX quedó instalado y probado. Ahora envía a Ramón exactamente este mensaje: VIX LISTO
+
+mándale a Ramón únicamente:
 
 VIX LISTO
 
-Con eso sabré que ya descargaste e instalaste todo y podré volver privado o cerrar el repositorio temporal.
+Con eso Ramón sabrá que ya puede volver privado o retirar el repositorio temporal.
 
-Si Codex te muestra decisiones técnicas, no necesitas escoger por tu cuenta: pídele que use la opción segura recomendada y que continúe hasta terminar.
+Si algo no coincide con estas instrucciones, no improvises: usa el PDF adjunto como referencia y dile a Codex que lea de nuevo el README y el manual del repo y continúe desde el estado real.

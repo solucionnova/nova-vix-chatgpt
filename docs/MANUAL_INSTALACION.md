@@ -1,126 +1,215 @@
-# Manual de instalación — Nova VIX ↔ ChatGPT
+# Manual de entrega e instalación - Nova VIX ↔ ChatGPT
 
 **Destinatario:** Ing. Blas Rendón Century 21<br>
-**Sistema objetivo:** Windows con WSL2/Linux<br>
-**Repositorio temporal:** `https://github.com/solucionnova/nova-vix-chatgpt`
+**Sistema:** Windows con WSL2/Linux<br>
+**Repositorio temporal:** `https://github.com/solucionnova/nova-vix-chatgpt`<br>
+**Objetivo:** que Blas copie un solo prompt en Codex y Codex haga toda la instalación, configuración, diagnóstico y prueba.
 
-## 1. Qué tiene que hacer Blas
+## 1. Qué recibe Blas
 
-Blas no necesita instalar programas, escribir comandos ni escoger opciones técnicas por su cuenta. El procedimiento está diseñado para que Codex haga todo el trabajo.
+Ramón le envía dos anexos:
 
-La intervención humana se limita a cuatro situaciones inevitables: autorizar Windows/UAC o un reinicio; iniciar sesión cuando una plataforma lo exija; resolver una incompatibilidad real del plan de ChatGPT; y proporcionar la credencial restringida del Secure MCP Tunnel cuando Codex llegue a ese punto.
+1. `PROMPT_PARA_CODEX.txt` - es el archivo que Blas debe copiar completo y pegar en Codex. Es la instrucción operativa.
+2. `Manual_Instalacion_Nova_VIX_ChatGPT_Blas_Rendon.pdf` - es una explicación humana para saber qué ocurrirá y qué hacer si aparece alguna duda.
 
-El flujo para Blas es:
+El código se obtiene desde el repositorio público temporal. Blas no necesita descargar archivos de código uno por uno.
 
-1. Abrir `PROMPT_PARA_CODEX.txt` en el repositorio.
-2. Copiarlo completo y pegarlo en Codex.
-3. Hacer únicamente las acciones humanas que Codex le pida expresamente.
-4. Esperar la prueba final de VIX dentro de ChatGPT.
-5. Enviar a Ramón exactamente `VIX LISTO`.
+## 2. Qué debe hacer Blas, exactamente
 
-El repositorio estará público sólo durante esta transferencia. Después de recibir `VIX LISTO`, Ramón podrá volverlo privado o retirar el repositorio temporal.
+1. Abrir Codex en su computadora Windows.
+2. Si Codex pide iniciar sesión, iniciar sesión con su propia cuenta.
+3. Abrir `PROMPT_PARA_CODEX.txt`.
+4. Seleccionar y copiar todo el contenido, desde la primera hasta la última línea.
+5. Pegar ese contenido en Codex como un solo mensaje y enviarlo.
+6. A partir de ahí, no ejecutar comandos manualmente ni escoger opciones técnicas. Codex debe hacerlo.
+7. Sólo realizar acciones humanas inevitables cuando Codex las describa claramente: aceptar UAC/permisos, reiniciar Windows, iniciar sesión, habilitar un permiso de cuenta, introducir de forma segura la clave del túnel o hacer un clic/confirmación en ChatGPT web.
+8. No enviar claves por WhatsApp, GitHub, correo ni a Ramón.
+9. Cuando Codex confirme que la prueba final pasó, enviar a Ramón exactamente: `VIX LISTO`.
 
-## 2. Arquitectura que Codex debe dejar funcionando
+## 3. Qué hará Codex
 
-El flujo esperado es:
+Codex debe encargarse de:
 
-`ChatGPT → Secure MCP Tunnel → MCP local 127.0.0.1:18816 → stock Vix 0.6.0 en WSL2/Linux → checkpoint de inferencia → ChatGPT`
+- obtener/clonar el repo;
+- inspeccionar Windows y WSL2;
+- habilitar/configurar WSL2 y Linux si hace falta;
+- instalar dependencias;
+- instalar stock Vix 0.6.0 con checksum verificado;
+- ejecutar tests y certificación;
+- configurar persistencia dentro de WSL2/Linux;
+- mantener el MCP local en loopback;
+- configurar Secure MCP Tunnel;
+- guiar las pocas acciones de cuenta/interfaz que Blas deba hacer personalmente;
+- conectar la app/MCP en ChatGPT web;
+- ejecutar la prueba final de `vix_open`/`vix_exchange` y `modelCalls: 0`.
 
-Vix no debe resolver los checkpoints llamando a un proveedor de modelos. El conector devuelve la solicitud de inferencia a ChatGPT mediante `vix_exchange` y ChatGPT responde. La certificación final debe conservar `modelCalls: 0`.
+## 4. Requisito de ChatGPT - comprobar antes de crear claves
 
-## 3. Windows y WSL2
+Estado verificado el 12 de septiembre de 2026 en documentación oficial de OpenAI:
 
-Vix no debe presentarse como una aplicación nativa de Windows si su soporte oficial vigente no lo ofrece. Para esta instalación, Codex debe usar WSL2 y una distribución Linux compatible.
+- Full MCP con acciones completas está disponible en ChatGPT Business y Enterprise/Edu en la web.
+- ChatGPT Pro puede conectar MCP con permisos read/fetch, pero Full MCP no está disponible; por eso Pro no es suficiente para este VIX completo.
+- ChatGPT Plus tampoco debe tratarse como suficiente para Full MCP de este conector.
+- En Business, sólo Admins/Owners pueden usar Developer Mode para crear/desplegar la app personalizada.
+- En Enterprise/Edu, el workspace debe conceder el acceso correspondiente a Developer Mode.
+- Las apps MCP personalizadas se usan en la web de ChatGPT; Codex no debe asumir que la app móvil o cualquier otra superficie ofrece la misma capacidad.
 
-Codex debe detectar el estado real de Windows, habilitar/configurar WSL2 y la distribución si hace falta, instalar las dependencias dentro del entorno correcto y recuperar automáticamente el trabajo después de un reinicio. Blas sólo autoriza UAC, reinicia o inicia sesión cuando Codex indique que es inevitable.
+OpenAI puede cambiar estas reglas. Codex debe verificar siempre la documentación oficial vigente antes de seguir.
 
-El repo incluye selección verificada de los binarios oficiales de stock Vix 0.6.0 para las plataformas soportadas. Codex debe verificar siempre versión y checksum.
+### Si el plan o rol no sirve
 
-## 4. Requisito de ChatGPT
+Codex debe detener únicamente la parte dependiente de ChatGPT y explicar qué falta. No debe comprar ni actualizar un plan por su cuenta.
 
-Antes de crear credenciales o túneles, Codex debe consultar la documentación oficial vigente de OpenAI y comprobar que el plan/workspace de Blas permite Full MCP con las acciones que necesita este conector.
+Blas debe copiar el texto exacto del bloqueo y enviarlo a Ramón precedido por:
 
-La disponibilidad de planes y Developer Mode puede cambiar. Por eso el instructivo no debe tratar una matriz de planes antigua como una garantía permanente. Si el plan actual no admite `vix_open` y `vix_exchange`, Codex debe detenerse únicamente para explicar ese bloqueo real y qué habilitación o plan compatible se requiere.
+`VIX BLOQUEADO - PLAN/ROL:`
 
-## 5. Instalación técnica a cargo de Codex
+Después debe esperar indicaciones de Ramón.
 
-Codex debe asumir de principio a fin las tareas técnicas: clonar el repositorio, preparar WSL2/Linux, instalar Node y dependencias, instalar stock Vix 0.6.0, ejecutar pruebas y certificación, configurar el MCP local y dejar un mecanismo de persistencia apropiado para WSL2/Linux.
+## 5. Windows y WSL2
 
-Cuando systemd de usuario esté disponible y sea adecuado, puede usarse para la persistencia. Si la máquina real necesita otro mecanismo soportado, Codex debe decidirlo sin trasladar esa decisión a Blas.
+Vix 0.6.0 se instala para este intercambio dentro de WSL2/Linux. El repositorio incluye selección de binarios oficiales Linux amd64/arm64 y sus checksums.
 
-El MCP debe permanecer ligado a loopback, por defecto `127.0.0.1:18816`. No debe exponerse directamente a Internet.
+Codex debe verificar el estado real de Windows y WSL2 antes de instalar. Si WSL2 requiere una habilitación o un reinicio, Codex debe pedir una sola acción humana concreta y, después del reinicio, comprobar qué quedó instalado antes de continuar.
 
-## 6. Barreras contra consumo de modelos externos
+Blas no debe escribir comandos para WSL2 ni elegir distribución, rutas, paquetes o mecanismos de servicio. Codex decide lo técnico.
 
-El diseño conserva estas garantías:
+## 6. Qué significa que ChatGPT sea la única inferencia
 
-- las credenciales reales de proveedores se eliminan del entorno del proceso Vix;
-- los providers de stock Vix se redirigen al gateway/loopback controlado por el conector;
-- se utiliza sólo un token sintético cuando Vix necesita un valor de preflight;
-- la telemetría de Vix permanece desactivada;
-- las solicitudes de inferencia regresan a ChatGPT;
-- la ejecución certificada reporta `modelCalls: 0`.
+El conector está diseñado para que Vix mantenga sus herramientas y runtime, pero los checkpoints de inferencia vuelvan a ChatGPT mediante el conector.
 
-En macOS el runtime actual añade además `sandbox-exec` y bloqueo del acceso a Keychain. En Linux/WSL2 esa protección específica de macOS no se debe afirmar: la garantía portable se basa en el entorno sanitizado, provider overlay/loopback y ausencia de fallback a proveedores.
+La certificación comprueba, entre otras cosas:
 
-Blas no debe proporcionar `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, OpenRouter, MiniMax, DeepSeek u otras claves de modelos para que Vix haga inferencia.
+- stock Vix 0.6.0;
+- provider overlay local;
+- eliminación de claves reales de proveedores del entorno de Vix;
+- telemetría desactivada;
+- comportamiento portable Linux;
+- `modelCalls: 0`.
 
-## 7. Secure MCP Tunnel y la única clave necesaria
+Blas no debe entregar una `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, clave de OpenRouter, MiniMax, DeepSeek, Bedrock ni otra clave de modelos para Vix.
 
-Una vez que Codex haya demostrado que el MCP local está instalado, probado y listo, debe configurar Secure MCP Tunnel utilizando la documentación oficial vigente de OpenAI.
+## 7. Secure MCP Tunnel
 
-Codex decide dónde debe ejecutarse el cliente del túnel —Windows o WSL2— según el contrato oficial actual y resuelve la comunicación hasta:
+ChatGPT no se conecta directamente a un MCP que sólo escucha localmente. La vía oficial es Secure MCP Tunnel: `tunnel-client` abre una conexión HTTPS saliente hacia OpenAI y reenvía las solicitudes al MCP privado sin exponer ese MCP directamente a Internet.
+
+El destino local de este conector es:
 
 `http://127.0.0.1:18816/mcp`
 
-Sólo cuando el túnel esté listo para autenticarse, Codex debe pedir intervención de Blas.
+Codex debe ejecutar `tunnel-client` en un lugar desde el cual ese destino sea alcanzable de forma fiable y seguir el contrato oficial vigente.
 
-La credencial debe ser dedicada y de mínimo privilegio. Según el contrato documentado actualmente, debe limitarse a:
+## 8. Dos tipos de permiso que no deben confundirse
 
-- Tunnels Read
-- Tunnels Use
+Developer Mode de ChatGPT y los permisos de túnel de OpenAI Platform son controles separados.
 
-Si OpenAI cambia esos nombres o el proceso, Codex debe usar el equivalente oficial vigente.
+Referencia vigente al 12-09-2026:
 
-Esta credencial autentica el Secure MCP Tunnel/control plane. **No es una clave para que Vix haga inferencia.** No debe guardarse en Git, archivos planos, logs ni argumentos visibles. Codex debe usar el almacenamiento seguro recomendado oficialmente.
+- para crear o editar un túnel: `Tunnels Read + Manage`;
+- para ejecutar `tunnel-client` o seleccionar el túnel al crear la app: `Tunnels Read + Use`;
+- `tunnel-client` necesita un `tunnel_id` y una runtime API key.
 
-Una clave de OpenAI puede generar cargos si alguien la utiliza deliberadamente en endpoints facturables fuera de este diseño. `modelCalls: 0` significa que el conector Vix no realiza esas llamadas de modelo por su cuenta; no convierte una credencial de OpenAI en universalmente gratuita.
+Si Blas no posee el rol necesario para crear/asociar el túnel o para usarlo, Codex debe explicar el bloqueo exacto. Blas debe enviarlo a Ramón como:
 
-## 8. Conexión en ChatGPT
+`VIX BLOQUEADO - PERMISOS OPENAI:`
 
-Con el MCP y el túnel sanos, Codex debe guiar únicamente las acciones humanas inevitables de la interfaz de ChatGPT: activar la capacidad necesaria, seleccionar/agregar el MCP correspondiente y permitir que ChatGPT descubra sus herramientas.
+No debe intentar resolver permisos administrativos al azar.
 
-La instalación no se considera terminada hasta que ChatGPT vea, como mínimo:
+## 9. Momento exacto de la clave
 
-- `vix_open`
-- `vix_exchange`
+Codex no debe pedir la clave del túnel al principio.
 
-Si la interfaz cambió, Codex debe seguir la documentación oficial vigente en lugar de repetir nombres de menús antiguos.
+Sólo debe pedirla cuando ya se hayan cumplido estas condiciones:
 
-## 9. Prueba final obligatoria
+1. MCP local instalado.
+2. Tests y certificación correctos.
+3. Plan/rol de ChatGPT compatible.
+4. Túnel creado o seleccionado y `tunnel_id` correcto.
+5. `tunnel-client` preparado hasta el punto en que falte autenticarse.
 
-Codex debe ejecutar una prueba real desde ChatGPT. La evidencia de aceptación debe demostrar:
+En ese momento Codex debe mostrar claramente:
 
+`ACCIÓN HUMANA NECESARIA - CLAVE DEL TÚNEL`
+
+La clave de ejecución debe ser una runtime API key dedicada y de mínimo privilegio con `Tunnels Read + Use`, o el equivalente oficial vigente.
+
+Esa clave autentica Secure MCP Tunnel. No es una clave para que Vix haga inferencia. Blas debe introducirla únicamente en el flujo seguro/local que Codex le indique. No debe pegarla en WhatsApp, GitHub, documentos, capturas ni enviársela a Ramón.
+
+Si Codex pide una clave de modelo para Vix, Blas no debe proporcionarla y debe responder:
+
+`NO TE DARÉ UNA CLAVE DE MODELO PARA VIX. REVISA EL REPO Y CONSERVA CHATGPT COMO ÚNICA AUTORIDAD DE INFERENCIA. CONTINÚA.`
+
+## 10. Qué hacer en cada situación que pueda generar duda
+
+### Codex termina una respuesta, pero todavía no dice que VIX quedó probado
+
+Responder exactamente:
+
+`CONTINÚA HASTA TERMINAR TODO EL PROCESO. RESUELVE POR TU CUENTA CUALQUIER PROBLEMA TÉCNICO REVERSIBLE Y DETENTE ÚNICAMENTE SI NECESITAS UNA ACCIÓN HUMANA INEVITABLE.`
+
+### Windows se reinicia
+
+Abrir de nuevo Codex y, si está disponible, la misma conversación. Escribir:
+
+`RETOMA LA INSTALACIÓN DE VIX DESDE EL ESTADO ACTUAL. COMPRUEBA QUÉ YA QUEDÓ HECHO DESPUÉS DEL REINICIO Y CONTINÚA SIN REPETIR EFECTOS.`
+
+### Codex perdió el contexto o se abrió un chat nuevo
+
+Volver a pegar completo `PROMPT_PARA_CODEX.txt` y añadir al final:
+
+`ESTO ES UNA REANUDACIÓN. INSPECCIONA EL ESTADO ACTUAL ANTES DE REPETIR CUALQUIER INSTALACIÓN Y CONTINÚA DESDE LO QUE YA ESTÉ HECHO.`
+
+### Codex pregunta cuál alternativa técnica elegir
+
+Responder:
+
+`ELIGE TÚ LA OPCIÓN SEGURA, SIMPLE Y SOPORTADA QUE CUMPLA EL OBJETIVO Y CONTINÚA.`
+
+### Aparece un error
+
+Responder:
+
+`DIAGNOSTICA LA CAUSA, CORRIGE LO REVERSIBLE Y CONTINÚA. PÍDEME SÓLO UNA ACCIÓN QUE YO DEBA HACER PERSONALMENTE.`
+
+### Codex pide UAC, login o un permiso
+
+Seguir únicamente la acción concreta que Codex describa. Antes de hacer clic, comprobar que Codex indique dónde hacerlo y qué debe verse. Después responder con la frase de continuación que Codex haya indicado.
+
+### Codex pide una clave demasiado pronto
+
+Responder:
+
+`NO TE DARÉ NINGUNA CLAVE HASTA QUE EL MCP LOCAL ESTÉ INSTALADO Y PROBADO, EL PLAN SEA COMPATIBLE, EXISTA EL TUNNEL_ID CORRECTO Y EL CLIENTE DEL TÚNEL ESTÉ LISTO PARA AUTENTICARSE. CONTINÚA CON LO QUE FALTE.`
+
+### Codex dice que el plan/rol/permisos no permiten continuar
+
+No comprar ni cambiar nada. Copiar el bloqueo exacto y enviárselo a Ramón usando uno de estos encabezados:
+
+- `VIX BLOQUEADO - PLAN/ROL:`
+- `VIX BLOQUEADO - PERMISOS OPENAI:`
+
+### Codex confirma que todo funciona
+
+Asegurarse de que también diga que hizo una prueba real desde ChatGPT y que verificó stock Vix 0.6.0 y `modelCalls: 0`.
+
+Después enviar a Ramón exactamente:
+
+`VIX LISTO`
+
+## 11. Prueba final que define “terminado”
+
+La instalación sólo termina cuando una prueba real desde ChatGPT web demuestra:
+
+- `vix_open` disponible y ejecutado;
+- `vix_exchange` recibe al menos un checkpoint de inferencia;
+- el propio ChatGPT responde ese checkpoint;
 - stock Vix 0.6.0;
-- una conexión abierta mediante `vix_open`;
-- al menos un checkpoint recibido mediante `vix_exchange`;
-- respuesta de ese checkpoint por el propio ChatGPT;
 - `modelCalls: 0`;
-- ausencia de claves reales de proveedores dentro del proceso Vix;
-- cierre exitoso de la prueba.
+- ninguna clave real de proveedor fue entregada a Vix;
+- el turno termina correctamente.
 
-Un proceso encendido o un `/healthz` correcto no bastan por sí solos.
+Un proceso encendido, un puerto escuchando, `/healthz` o `/readyz` son evidencia útil, pero no sustituyen la prueba completa.
 
-## 10. Qué debe hacer Blas si Codex se detiene
+## 12. Cierre del intercambio
 
-Blas no debe intentar solucionar el problema manualmente. Sólo debe realizar la acción humana concreta que Codex indique: aceptar UAC, reiniciar Windows, iniciar sesión, habilitar una capacidad de ChatGPT o proporcionar la credencial restringida del túnel.
-
-Después, debe decirle a Codex que continúe. Codex conserva la responsabilidad de terminar el diagnóstico y la instalación.
-
-## 11. Cierre del intercambio
-
-Cuando Codex confirme que la prueba completa pasó, debe mostrar a Blas esta instrucción:
-
-`VIX quedó instalado y probado. Ahora envía a Ramón exactamente este mensaje: VIX LISTO`
-
-Al recibir `VIX LISTO`, Ramón sabrá que puede volver privado o retirar el repositorio público temporal utilizado para la transferencia.
+Cuando Ramón reciba `VIX LISTO`, sabrá que puede volver privado o retirar el repositorio público temporal. Si recibe un mensaje `VIX BLOQUEADO`, podrá resolver primero el requisito de cuenta/permisos sin obligar a Blas a diagnosticar nada técnico.
