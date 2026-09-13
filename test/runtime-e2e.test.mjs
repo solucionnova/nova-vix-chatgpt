@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -117,5 +117,33 @@ test('stock Vix continues to a second ChatGPT checkpoint after a tool result', a
   }
   assert.equal(closed, true, 'Vix post-tool turn did not finish');
   assert.match(JSON.stringify(events), /VIX_TOOL_CONTINUITY_OK/);
+  assert.equal(manager.modelCalls, 0);
+});
+
+test('stock Vix preserves user-global skills from HOME', async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'nova-vix-global-skill-project-'));
+  const home = await mkdtemp(join(tmpdir(), 'nova-vix-global-skill-home-'));
+  const skillDir = join(home, '.vix', 'skills', 'global-probe');
+  await mkdir(skillDir, { recursive: true });
+  await writeFile(join(skillDir, 'SKILL.md'), `---\nname: global-probe\ndescription: Deterministic user-global skill visibility probe.\n---\n\n# Global Probe\n\nGLOBAL_SKILL_OK\n`);
+
+  const manager = new VixProcessManager({ vixBin, baseEnv: { ...process.env, HOME: home } });
+  t.after(async () => { await manager.close(); await rm(cwd, { recursive: true, force: true }); await rm(home, { recursive: true, force: true }); });
+
+  const opened = await manager.open({ cwd, prompt: 'Probe user global Vix skills without using tools.' });
+  const skills = new Set();
+  let pending = null;
+  for (let i = 0; i < 80 && !pending; i += 1) {
+    const state = await manager.exchange({ connection_id: opened.connection_id, wait_ms: 250 });
+    for (const event of state.events) {
+      if (event.type === 'event.skills_available') for (const skill of event.data?.skills || []) skills.add(skill.name);
+    }
+    if (state.closed && state.error) assert.fail(state.error);
+    pending = state.inference_requests[0] ?? null;
+  }
+
+  assert.ok(pending, 'stock Vix must emit a ChatGPT checkpoint');
+  assert.ok(skills.has('global-probe'), `missing user-global skill; saw: ${[...skills].join(', ')}`);
+  assert.match(JSON.stringify(pending.request), /global-probe/);
   assert.equal(manager.modelCalls, 0);
 });
