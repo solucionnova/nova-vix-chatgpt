@@ -15,6 +15,8 @@ test('macOS service installer is portable and dry-run is side-effect free', asyn
   assert.doesNotMatch(source, /\/Users\/|blocked-/);
   assert.match(source, /NOVA_VIX_INSTALL_DRY_RUN/);
   assert.match(source, /127\.0\.0\.1/);
+  assert.match(source, /bootstrap_ok=0/);
+  assert.match(source, /after 5 attempts/);
 
   const testHome = '/tmp/nova-vix-test-home';
   const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
