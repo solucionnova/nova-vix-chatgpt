@@ -85,6 +85,18 @@ fi
 [[ -x "$ROOT/runtime/vix-v0.6.0/vix" && -x "$ROOT/runtime/vix-v0.6.0/vixd" ]] || { echo "Release Vix runtime missing: $ROOT" >&2; exit 9; }
 /usr/bin/install -m 0644 "$PLIST" "$TARGET"
 launchctl bootout "$DOMAIN/$LABEL" >/dev/null 2>&1 || true
-launchctl bootstrap "$DOMAIN" "$TARGET"
+bootstrap_ok=0
+bootstrap_error=''
+for attempt in 1 2 3 4 5; do
+  if bootstrap_error="$(launchctl bootstrap "$DOMAIN" "$TARGET" 2>&1)"; then
+    bootstrap_ok=1
+    break
+  fi
+  sleep 1
+done
+if [[ "$bootstrap_ok" != "1" ]]; then
+  echo "launchd bootstrap failed after 5 attempts: $bootstrap_error" >&2
+  exit 10
+fi
 launchctl kickstart -k "$DOMAIN/$LABEL"
 launchctl print "$DOMAIN/$LABEL"
