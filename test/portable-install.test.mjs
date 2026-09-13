@@ -16,14 +16,20 @@ test('macOS service installer is portable and dry-run is side-effect free', asyn
   assert.match(source, /NOVA_VIX_INSTALL_DRY_RUN/);
   assert.match(source, /127\.0\.0\.1/);
 
+  const testHome = '/tmp/nova-vix-test-home';
   const output = execFileSync('/bin/bash', [serviceInstaller], {
     cwd: root,
-    env: { ...process.env, NOVA_VIX_INSTALL_DRY_RUN: '1', NODE_BIN: process.execPath, PORT: '18816' },
+    env: { ...process.env, HOME: testHome, NOVA_VIX_INSTALL_DRY_RUN: '1', NODE_BIN: process.execPath, PORT: '18816' },
     encoding: 'utf8'
   });
   assert.match(output, /label=com\.nova\.vix-chatgpt/);
   assert.match(output, /port=18816/);
   assert.match(output, /plist_valid=true/);
+  const pathLine = output.split('\n').find(line => line.startsWith('path='));
+  assert.ok(pathLine, 'dry-run must expose the launchd PATH');
+  const launchPath = pathLine.slice('path='.length).split(':');
+  assert.ok(launchPath.indexOf(`${testHome}/.local/bin`) >= 0, 'launchd PATH must include the user-local gateway directory');
+  assert.ok(launchPath.indexOf(`${testHome}/.local/bin`) < launchPath.indexOf('/opt/homebrew/bin'), 'user-local gateway directory must precede Homebrew');
 });
 
 test('Vix installer selects verified Darwin and Linux assets without downloading', () => {
