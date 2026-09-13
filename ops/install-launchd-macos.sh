@@ -23,7 +23,8 @@ ROOT_XML="$(xml_escape "$ROOT")"
 HOME_XML="$(xml_escape "$HOME")"
 LOG_XML="$(xml_escape "$LOG_DIR")"
 LABEL_XML="$(xml_escape "$LABEL")"
-PATH_XML="$(xml_escape "$(dirname "$NODE_BIN"):/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin")"
+LAUNCH_PATH="$HOME/.local/bin:$(dirname "$NODE_BIN"):/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+PATH_XML="$(xml_escape "$LAUNCH_PATH")"
 PLIST="$(mktemp "${TMPDIR:-/tmp}/nova-vix-chatgpt.XXXXXX.plist")"
 trap 'rm -f "$PLIST"' EXIT
 
@@ -55,7 +56,7 @@ EOF
 
 /usr/bin/plutil -lint "$PLIST" >/dev/null
 if [[ "$DRY_RUN" == "1" ]]; then
-  printf 'label=%s\nnode=%s\nroot=%s\nport=%s\nplist_valid=true\n' "$LABEL" "$NODE_BIN" "$ROOT" "$PORT"
+  printf 'label=%s\nnode=%s\nroot=%s\nport=%s\npath=%s\nplist_valid=true\n' "$LABEL" "$NODE_BIN" "$ROOT" "$PORT" "$LAUNCH_PATH"
   exit 0
 fi
 

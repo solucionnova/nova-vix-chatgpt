@@ -135,11 +135,12 @@ export class VixProcessManager {
     if (this.platformName === 'darwin') await validateVixExecutable(SANDBOX_EXEC);
     else if (this.platformName !== 'linux') throw new Error(`Unsupported Vix runtime platform: ${this.platformName}`);
     const runtimeDir = await mkdtemp(join(tmpdir(), 'nova-vix-chatgpt-'));
+    const configDir = join(runtimeDir, '.vix');
     const bridge = new GatewayBridge();
     await bridge.start();
-    await mkdir(join(runtimeDir, '.vix'), { recursive: true });
+    await mkdir(configDir, { recursive: true });
     await mkdir(join(runtimeDir, 'logs'), { recursive: true });
-    await writeFile(join(runtimeDir, '.vix', 'providers.json'), JSON.stringify(buildProviderOverlay(bridge.baseUrl), null, 2) + '\n', { mode: 0o600 });
+    await writeFile(join(configDir, 'providers.json'), JSON.stringify(buildProviderOverlay(bridge.baseUrl), null, 2) + '\n', { mode: 0o600 });
     const tokenPath = join(runtimeDir, 'socket-token');
     await writeFile(tokenPath, randomBytes(32).toString('hex') + '\n', { mode: 0o600 });
     const socketPath = join(runtimeDir, 'vixd.sock');
@@ -155,7 +156,7 @@ export class VixProcessManager {
       daemon.stderr.on('data', chunk => { const text = sanitizeError(chunk); if (text.trim()) daemonError = text.trim(); });
       await waitForSocket(socketPath, daemon);
 
-      const args = ['-p', prompt, '-output-format', 'stream-json', '-workdir', resolve(cwd), '-socket-path', socketPath, '-auth-token-path', tokenPath];
+      const args = ['-config-dir', configDir, '-p', prompt, '-output-format', 'stream-json', '-workdir', resolve(cwd), '-socket-path', socketPath, '-auth-token-path', tokenPath];
       if (workflow) args.push('-w', workflow);
       const id = randomUUID();
       const conn = { id, bridge, child: null, daemon, runtimeDir, events: [], stdoutBuffer: '', closed: false, exitCode: null, error: daemonError || null, webPort };
@@ -177,7 +178,7 @@ export class VixProcessManager {
         platform: this.platformName,
         platformIsolation: daemonLaunch.spec.platformIsolation,
         keychainAccessBlocked: daemonLaunch.spec.keychainAccessBlocked,
-        configDirOverrideUsed: false,
+        configDirOverrideUsed: true,
         runtimeDir,
         socketPath,
         webPort,
