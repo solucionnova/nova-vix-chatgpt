@@ -1,7 +1,6 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { VixProcessManager, inspectVixBinary, validateVixExecutable } from './vix-process.mjs';
-import { GithubAuthority } from './github-authority.mjs';
 
 export { validateVixExecutable } from './vix-process.mjs';
 export const DEFAULT_VIX_BIN = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'runtime', 'vix-v0.6.0', 'vix');
@@ -13,16 +12,13 @@ export function createRuntimeStub() {
     async exchange({ connection_id }) { return { connection_id, resume_id: connection_id, events: [], inference_requests: [], closed: false, exit_code: null, mission_control_url: null, modelCalls: 0, error: null }; },
     async inferenceContext() { throw new Error('No pending Vix inference request in MCP metadata test mode'); },
     async closeConnection(connection_id) { return { status: 'not_found', connection_id }; },
-    async close() {},
-    async githubCapabilities() { return { ok: true, identity: { host: 'test', login: 'test' }, scopes: ['repo'], required_scopes: [], missing_scopes: [], modelCalls: 0 }; },
-    async githubIssueLabel() { return { ok: true, modelCalls: 0, reversible_with: 'remove' }; }
+    async close() {}
   };
 }
 
 export async function createConnectorRuntime({ vixBin = process.env.NOVA_VIX_BIN || process.env.VIX_BIN || DEFAULT_VIX_BIN, baseEnv = process.env } = {}) {
   const selected = await validateVixExecutable(vixBin);
   const manager = new VixProcessManager({ vixBin: selected, baseEnv });
-  const github = new GithubAuthority({ env: baseEnv });
   return {
     async health() {
       try {
@@ -37,8 +33,6 @@ export async function createConnectorRuntime({ vixBin = process.env.NOVA_VIX_BIN
     async inferenceContext(args) { return manager.inferenceContext(args); },
     async closeConnection(id) { return manager.closeConnection(id); },
     async close() { await manager.close(); },
-    async githubCapabilities(args) { return github.capabilities(args); },
-    async githubIssueLabel(args) { return github.issueLabel(args); },
     manager
   };
 }
