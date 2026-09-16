@@ -1,53 +1,42 @@
-# Nova VIX ↔ ChatGPT - transferencia para Ing. Blas Rendón Century 21
+# Nova Vix ↔ ChatGPT
 
-Este repositorio es una copia pública temporal para que Codex pueda descargar el conector VIX e instalarlo en la computadora Windows del Ing. Blas Rendón Century 21.
+Conector de ingeniería que expone stock Vix a ChatGPT sin delegar inferencia. ChatGPT conserva criterio e inferencia; el runtime Vix opera con `modelCalls=0` y recibe checkpoints/respuestas a través del bridge local.
 
-## Lo único que debe hacer Blas
+## Runtime actual
 
-1. Descargar o abrir el anexo `PROMPT_PARA_CODEX.txt`.
-2. Abrir Codex en su computadora Windows e iniciar sesión si se lo pide.
-3. Copiar TODO el contenido de `PROMPT_PARA_CODEX.txt` y pegarlo en Codex como un solo mensaje.
-4. Dejar que Codex haga el trabajo técnico. Blas sólo interviene cuando una acción humana no puede automatizarse: aceptar UAC/permisos de Windows, reiniciar, iniciar sesión, habilitar un permiso de su cuenta, introducir de forma segura la credencial restringida del Secure MCP Tunnel o realizar una confirmación en la interfaz web de ChatGPT.
-5. No ejecutar comandos manualmente, no elegir entre alternativas técnicas y no compartir claves por WhatsApp, GitHub, correo ni chat.
-6. Cuando Codex confirme con la prueba final que VIX funciona desde ChatGPT, enviar a Ramón exactamente: `VIX LISTO`.
+- Servicio macOS: `com.ramon.nova-vix-chatgpt`.
+- MCP loopback: `127.0.0.1:18816` (`/mcp`, `/healthz`, `/readyz`).
+- Stock runtime: Vix `v0.6.0`.
+- Inferencia: exclusivamente ChatGPT mediante loopback; no requiere claves reales de proveedores dentro de Vix.
+- Transporte externo: Cloudflare Tunnel compartido de ingeniería, owner externo al repo. Este repo no instala ni administra OpenAI `tunnel-client`.
 
-El manual humano completo está en `docs/MANUAL_INSTALACION.md` y en el PDF adjunto `docs/Manual_Instalacion_Nova_VIX_ChatGPT_Blas_Rendon.pdf`.
+El listener permanece en loopback; Cloudflare publica la ruta externa desde la Mac de Nova. Hostname, tunnel ID y credenciales no se versionan aquí.
 
-## Requisito de ChatGPT que Codex debe comprobar primero
+## Superficie ChatGPT
 
-Estado verificado el 12 de septiembre de 2026 en documentación oficial de OpenAI:
+- `vix_open`: abre o reanuda una sesión stock Vix.
+- `vix_exchange`: intercambia eventos/checkpoints e inference requests; ChatGPT responde cada `request_id`.
 
-- Full MCP con acciones completas está disponible en ChatGPT Business y Enterprise/Edu en la web.
-- ChatGPT Pro sólo admite MCP con permisos read/fetch; no es suficiente para este conector VIX completo.
-- ChatGPT Plus no debe tratarse como compatible con Full MCP para este conector.
-- En Business, el usuario debe ser Admin/Owner para usar Developer Mode y desplegar la app personalizada.
-- En Enterprise/Edu, el acceso a Developer Mode debe estar habilitado por el workspace según sus controles.
-- Un MCP local no se conecta directamente a ChatGPT; para esta instalación se usa Secure MCP Tunnel.
+La aceptación operativa requiere `readyz` con `ready=true`, `modelCalls=0`, stock Vix esperado y una prueba real desde ChatGPT cuando cambie el contrato visible o el transporte.
 
-Estas condiciones pueden cambiar. Codex debe comprobar la documentación oficial vigente antes de crear credenciales o configurar el túnel. Si el plan, rol o permisos reales no son suficientes, Codex debe detener únicamente esa parte, explicar exactamente el bloqueo y no comprar, actualizar ni modificar la suscripción por cuenta propia.
+## Desarrollo
 
-## Resultado técnico que Codex debe dejar probado
+```sh
+npm ci
+npm test
+npm run certify
+```
 
-En Windows, Vix se ejecuta dentro de WSL2/Linux usando stock Vix 0.6.0. El repositorio contiene soporte verificado para descargar los binarios oficiales Linux con checksum.
+Instalación del runtime stock:
 
-La aceptación exige una prueba real desde ChatGPT que demuestre como mínimo:
+```sh
+npm run install:vix
+```
 
-- `vix_open` disponible y ejecutable;
-- `vix_exchange` disponible y capaz de devolver un checkpoint de inferencia a ChatGPT;
-- stock Vix 0.6.0;
-- `modelCalls: 0`;
-- ausencia de claves reales de proveedores dentro del proceso Vix.
+Lifecycle macOS:
 
-Un proceso encendido o un health check por sí solos no equivalen a instalación terminada.
+```sh
+./ops/install-launchd-macos.sh
+```
 
-## Credenciales
-
-Vix no debe recibir claves reales de OpenAI, Anthropic, OpenRouter, MiniMax, DeepSeek, Bedrock ni otros proveedores de modelos.
-
-Secure MCP Tunnel sí necesita autenticación propia. Codex debe comprobar el contrato oficial vigente. A fecha de esta entrega:
-
-- crear o editar un túnel requiere `Tunnels Read + Manage`;
-- ejecutar `tunnel-client` o seleccionar el túnel al crear la app requiere `Tunnels Read + Use`;
-- la credencial de ejecución debe ser una runtime API key dedicada y de mínimo privilegio.
-
-La credencial del túnel autentica el transporte/control plane. No es una clave de inferencia para Vix. `modelCalls: 0` certifica que este conector no usa proveedores externos para resolver la inferencia de Vix; no debe interpretarse como una garantía de coste cero para cualquier uso diferente que alguien haga de una API key de OpenAI.
+El transporte Cloudflare se gestiona fuera de este repo mediante el owner compartido de conectores de ingeniería. No reintroducir Secure MCP Tunnel/OpenAI `tunnel-client` como fallback.
